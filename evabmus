@@ -1,1 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>everything about music — Holiday Edition</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cormorant Garamond for expressive editorial headings, Plus Jakarta Sans for clean UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Tailwind Custom Configuration for Muted Christmas Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        evergreen: {
+                            950: '#0b1310',
+                            900: '#111d18',
+                            800: '#182821',
+                            700: '#22382e',
+                            600: '#2e4a3d',
+                        },
+                        cranberry: {
+                            900: '#4a1820',
+                            800: '#6e232f',
+                            700: '#852b39',
+                            600: '#9e3646',
+                        },
+                        champagne: {
+                            200: '#ebe4d5',
+                            300: '#d8ccb8',
+                            400: '#c8a97e',
+                            500: '#b39062',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Minimal Custom CSS for Subtle Snowfall & Audio Equalizer Animation -->
+    <style>
+        body {
+            background-color: #0b1310;
+            color: #ebe4d5;
+            overflow-x: hidden;
+        }
+
+        /* Subtle ambient snow canvas */
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 40;
+            opacity: 0.45;
+        }
+
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1310;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #22382e;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c8a97e;
+        }
+
+        /* Equalizer bars for active track preview */
+        @keyframes eq-bounce {
+            0%, 100% { height: 4px; }
+            50% { height: 16px; }
+        }
+        .eq-bar {
+            width: 3px;
+            background-color: #c8a97e;
+            border-radius: 2px;
+            animation: eq-bounce 0.8s ease-in-out infinite;
+        }
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+
+        /* Smooth fade-in utility */
+        .fade-in {
+            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-cranberry-800 selection:text-champagne-200">
+
+    <!-- Ambient Winter Snowfall Overlay -->
+    <canvas id="snow-canvas" aria-hidden="true"></canvas>
+
+    <!-- Toast Notification Container (Replaces alert()) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-30 bg-evergreen-950/90 backdrop-blur-md border-b border-evergreen-700/60">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Title -->
+                <a href="#" class="flex items-center gap-3 group focus:outline-none">
+                    <span class="w-9 h-9 rounded-lg bg-cranberry-800/80 border border-champagne-400/30 flex items-center justify-center text-champagne-400 transition-transform duration-300 group-hover:scale-105">
+                        <!-- Custom Minimalist Vinyl/Pine SVG Icon -->
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                            <circle cx="12" cy="12" r="9"/>
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <span class="font-serif text-xl sm:text-2xl font-semibold tracking-tight text-champagne-200 block leading-none">everything about music</span>
+                        <span class="text-[11px] uppercase tracking-[0.2em] text-champagne-400/80 font-medium">Winter Anthology</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-champagne-300">
+                    <a href="#essence" class="hover:text-champagne-400 transition-colors py-2">What is Music</a>
+                    <a href="#types" class="hover:text-champagne-400 transition-colors py-2">Forms & Types</a>
+                    <a href="#genres" class="hover:text-champagne-400 transition-colors py-2">Genres</a>
+                    <a href="#popular" class="hover:text-champagne-400 transition-colors py-2">Western Charts</a>
+                    <a href="#recommendations" class="hover:text-champagne-400 transition-colors py-2">Recommendations</a>
+                </nav>
+
+                <!-- Saved Library Counter & Mobile Menu Button -->
+                <div class="flex items-center gap-3">
+                    <button id="open-saved-btn" type="button" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-evergreen-800 hover:bg-evergreen-700 border border-evergreen-600/70 text-xs sm:text-sm font-medium text-champagne-200 transition-all">
+                        <svg class="w-4 h-4 text-champagne-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Saved</span>
+                        <span id="saved-count-badge" class="px-1.5 py-0.5 text-xs rounded-md bg-cranberry-800 text-champagne-200 font-semibold">0</span>
+                    </button>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button id="mobile-menu-btn" type="button" aria-label="Toggle Menu" class="lg:hidden p-2.5 rounded-xl bg-evergreen-800 border border-evergreen-700 text-champagne-200 hover:text-champagne-400">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-evergreen-900 border-b border-evergreen-700 px-4 pt-2 pb-5 space-y-1">
+            <a href="#essence" class="mobile-link block px-3 py-3 rounded-lg text-base font-medium text-champagne-200 hover:bg-evergreen-800">What is Music</a>
+            <a href="#types" class="mobile-link block px-3 py-3 rounded-lg text-base font-medium text-champagne-200 hover:bg-evergreen-800">Forms & Types</a>
+            <a href="#genres" class="mobile-link block px-3 py-3 rounded-lg text-base font-medium text-champagne-200 hover:bg-evergreen-800">Genres</a>
+            <a href="#popular" class="mobile-link block px-3 py-3 rounded-lg text-base font-medium text-champagne-200 hover:bg-evergreen-800">Western Charts</a>
+            <a href="#recommendations" class="mobile-link block px-3 py-3 rounded-lg text-base font-medium text-champagne-200 hover:bg-evergreen-800">Recommendations</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION: First Screen -->
+        <section class="relative py-16 sm:py-24 lg:py-28 border-b border-evergreen-800">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <!-- Left Editorial Copy -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-evergreen-800/90 border border-champagne-400/25 text-champagne-400 text-xs font-semibold tracking-wider uppercase">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cranberry-600"></span>
+                            Curated for Listeners & Audiophiles
+                        </div>
+                        
+                        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-champagne-200 leading-[1.12] tracking-tight">
+                            The Architecture of Sound, Rhythm &amp; Quiet Wonder.
+                        </h1>
+                        
+                        <p class="text-base sm:text-lg text-champagne-300/90 leading-relaxed max-w-2xl">
+                            Welcome to <span class="text-champagne-200 font-medium">everything about music</span>—a winter sanctuary exploring the anatomy of melody, the evolution of Western genres, today's defining global tracks, and tailored sonic discoveries.
+                        </p>
+
+                        <div class="pt-2 flex flex-col sm:flex-row gap-4">
+                            <a href="#recommendations" class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-cranberry-800 hover:bg-cranberry-700 border border-champagne-400/30 text-champagne-200 font-medium text-sm sm:text-base transition-all shadow-lg shadow-black/25">
+                                <span>Discover Recommendations</span>
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                            <a href="#popular" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-evergreen-800 hover:bg-evergreen-700 border border-evergreen-600 text-champagne-200 font-medium text-sm sm:text-base transition-all">
+                                Explore Western Charts
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right Interactive Ambient Vinyl / Synth Card -->
+                    <div class="lg:col-span-5">
+                        <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700/80 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                            <!-- Subtle decorative corner lines -->
+                            <div class="flex items-center justify-between border-b border-evergreen-700/70 pb-4 mb-6">
+                                <span class="text-xs uppercase tracking-widest text-champagne-400 font-semibold">Acoustic Chamber</span>
+                                <span id="synth-status-badge" class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300 border border-evergreen-700">Standby</span>
+                            </div>
+
+                            <!-- Geometric Vinyl Illustration -->
+                            <div class="flex flex-col items-center text-center my-4">
+                                <div id="vinyl-disc" class="w-40 h-40 sm:w-44 sm:h-44 rounded-full bg-evergreen-950 border-4 border-evergreen-700 flex items-center justify-center relative shadow-inner transition-transform duration-700">
+                                    <div class="w-28 h-28 rounded-full border border-evergreen-800 flex items-center justify-center">
+                                        <div class="w-16 h-16 rounded-full bg-cranberry-800 border border-champagne-400/40 flex items-center justify-center">
+                                            <div class="w-3 h-3 rounded-full bg-champagne-200"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h2 class="font-serif text-2xl font-semibold text-champagne-200 mt-5">Nocturne in Pine &amp; Brass</h2>
+                                <p class="text-xs sm:text-sm text-champagne-300/80 mt-1">Interactive Harmonic Preview • 432 Hz Warmth</p>
+                            </div>
+
+                            <!-- Interactive Harmonic Chord Trigger -->
+                            <div class="mt-6 pt-5 border-t border-evergreen-700/70 flex items-center justify-between gap-3">
+                                <button id="hero-play-btn" type="button" class="flex-1 py-3 px-4 rounded-xl bg-evergreen-800 hover:bg-evergreen-700 border border-champagne-400/30 text-champagne-200 text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                                    <svg id="hero-play-icon" class="w-4 h-4 text-champagne-400" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    <span id="hero-play-text">Play Winter Chord</span>
+                                </button>
+                                <div class="text-right">
+                                    <span class="block text-[11px] uppercase tracking-wider text-champagne-400">Tempo</span>
+                                    <span class="text-sm font-medium text-champagne-200">72 BPM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: WHAT IS MUSIC (Information & Core Elements) -->
+        <section id="essence" class="py-16 sm:py-24 border-b border-evergreen-800">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mb-12">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-champagne-400">01 • Foundations</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-champagne-200 mt-2">What is Music?</h2>
+                    <p class="text-champagne-300/90 mt-4 text-base sm:text-lg leading-relaxed">
+                        Music is the deliberate organization of sound and silence across time. Beyond physics and acoustics, it serves as humanity's oldest emotional language—transforming air vibrations into memory, tension, and release.
+                    </p>
+                </div>
+
+                <!-- Interactive Pillars of Music -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Pillar 1 -->
+                    <article class="rounded-2xl bg-evergreen-900/90 border border-evergreen-700/70 p-6 flex flex-col justify-between hover:border-champagne-400/40 transition-colors">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-cranberry-900/80 border border-cranberry-700 flex items-center justify-center text-champagne-400 font-serif text-lg font-bold mb-4">I</div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Melody</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2.5 leading-relaxed">
+                                A linear sequence of single pitches perceived as a unified whole. Melody is the narrative voice of a composition—the contour a listener remembers and hums long after the music ends.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-evergreen-800 flex items-center justify-between">
+                            <span class="text-xs text-champagne-400">Horizontal Pitch</span>
+                            <button type="button" data-note="261.63" class="play-tone-btn text-xs font-medium px-3 py-1.5 rounded-lg bg-evergreen-800 hover:bg-evergreen-700 text-champagne-200 border border-evergreen-600 transition-colors">Hear C4</button>
+                        </div>
+                    </article>
+
+                    <!-- Pillar 2 -->
+                    <article class="rounded-2xl bg-evergreen-900/90 border border-evergreen-700/70 p-6 flex flex-col justify-between hover:border-champagne-400/40 transition-colors">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-cranberry-900/80 border border-cranberry-700 flex items-center justify-center text-champagne-400 font-serif text-lg font-bold mb-4">II</div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Harmony</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2.5 leading-relaxed">
+                                The vertical depth created when multiple notes sound simultaneously. Chords establish emotional atmosphere—major intervals evoke warmth and clarity, while minor intervals suggest introspection.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-evergreen-800 flex items-center justify-between">
+                            <span class="text-xs text-champagne-400">Vertical Depth</span>
+                            <button type="button" data-note="329.63" class="play-tone-btn text-xs font-medium px-3 py-1.5 rounded-lg bg-evergreen-800 hover:bg-evergreen-700 text-champagne-200 border border-evergreen-600 transition-colors">Hear E4</button>
+                        </div>
+                    </article>
+
+                    <!-- Pillar 3 -->
+                    <article class="rounded-2xl bg-evergreen-900/90 border border-evergreen-700/70 p-6 flex flex-col justify-between hover:border-champagne-400/40 transition-colors">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-cranberry-900/80 border border-cranberry-700 flex items-center justify-center text-champagne-400 font-serif text-lg font-bold mb-4">III</div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Rhythm</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2.5 leading-relaxed">
+                                The pulse and architecture of time in music. Through meter, tempo, and syncopation, rhythm anchors sound to physical movement and gives every genre its unmistakable heartbeat.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-evergreen-800 flex items-center justify-between">
+                            <span class="text-xs text-champagne-400">Temporal Pulse</span>
+                            <button type="button" data-note="392.00" class="play-tone-btn text-xs font-medium px-3 py-1.5 rounded-lg bg-evergreen-800 hover:bg-evergreen-700 text-champagne-200 border border-evergreen-600 transition-colors">Hear G4</button>
+                        </div>
+                    </article>
+
+                    <!-- Pillar 4 -->
+                    <article class="rounded-2xl bg-evergreen-900/90 border border-evergreen-700/70 p-6 flex flex-col justify-between hover:border-champagne-400/40 transition-colors">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-cranberry-900/80 border border-cranberry-700 flex items-center justify-center text-champagne-400 font-serif text-lg font-bold mb-4">IV</div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Timbre</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2.5 leading-relaxed">
+                                Often called tone color, timbre is what distinguishes a velvet cello from a muted trumpet playing the exact same pitch. It gives instrumentation its tactile warmth and character.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-evergreen-800 flex items-center justify-between">
+                            <span class="text-xs text-champagne-400">Sonic Texture</span>
+                            <button type="button" data-note="493.88" class="play-tone-btn text-xs font-medium px-3 py-1.5 rounded-lg bg-evergreen-800 hover:bg-evergreen-700 text-champagne-200 border border-evergreen-600 transition-colors">Hear B4</button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TYPES OF MUSIC (Forms & Classifications) -->
+        <section id="types" class="py-16 sm:py-24 border-b border-evergreen-800 bg-evergreen-900/35">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-champagne-400">02 • Classification</span>
+                        <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-champagne-200 mt-2">Types of Music</h2>
+                    </div>
+                    <p class="text-sm sm:text-base text-champagne-300/85 max-w-md">
+                        How musical works are categorized by instrumentation, cultural function, and compositional tradition.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Type Card 1 -->
+                    <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700/80 p-6 sm:p-8 flex gap-5 items-start">
+                        <div class="w-12 h-12 rounded-xl bg-evergreen-800 border border-champagne-400/25 flex items-center justify-center shrink-0 text-champagne-400">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Instrumental Music</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2 leading-relaxed">
+                                Compositions written exclusively for instruments without spoken or sung lyrics. From solo piano nocturnes and string quartets to cinematic orchestral scores, instrumental works rely entirely on melody, harmony, and dynamics to tell a story.
+                            </p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Symphonic</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Chamber</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Ambient</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Card 2 -->
+                    <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700/80 p-6 sm:p-8 flex gap-5 items-start">
+                        <div class="w-12 h-12 rounded-xl bg-evergreen-800 border border-champagne-400/25 flex items-center justify-center shrink-0 text-champagne-400">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Vocal &amp; Choral Music</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2 leading-relaxed">
+                                Centered around the human voice—the most intimate instrument. Includes solo singer-songwriter ballads, a cappella ensembles, winter carol choirs, and operatic arias where poetry and pitch merge into direct emotional expression.
+                            </p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">A Cappella</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Ballads</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Choral</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Card 3 -->
+                    <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700/80 p-6 sm:p-8 flex gap-5 items-start">
+                        <div class="w-12 h-12 rounded-xl bg-evergreen-800 border border-champagne-400/25 flex items-center justify-center shrink-0 text-champagne-400">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Electronic &amp; Synthesized</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2 leading-relaxed">
+                                Crafted using analog synthesizers, digital audio workstations, drum machines, and acoustic sampling. Electronic music expands the sonic palette beyond physical instruments into atmospheric textures and hypnotic rhythms.
+                            </p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Downtempo</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Synth-Pop</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">House</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Card 4 -->
+                    <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700/80 p-6 sm:p-8 flex gap-5 items-start">
+                        <div class="w-12 h-12 rounded-xl bg-evergreen-800 border border-champagne-400/25 flex items-center justify-center shrink-0 text-champagne-400">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-serif text-2xl font-semibold text-champagne-200">Traditional &amp; Folk</h3>
+                            <p class="text-sm text-champagne-300/85 mt-2 leading-relaxed">
+                                Acoustic songs passed down across generations that preserve regional heritage, seasonal celebrations, and communal storytelling. Often built on acoustic guitar, fiddle, mandolin, and warm vocal harmonies.
+                            </p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Americana</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Celtic</span>
+                                <span class="text-xs px-2.5 py-1 rounded-md bg-evergreen-800 text-champagne-300">Acoustic</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: GENRES OF SONGS (Interactive Explorer) -->
+        <section id="genres" class="py-16 sm:py-24 border-b border-evergreen-800">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mb-10">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-champagne-400">03 • Sonic Spectrum</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-champagne-200 mt-2">Genres of Songs</h2>
+                    <p class="text-champagne-300/90 mt-3 text-base">
+                        Select a genre below to inspect its defining instruments, historical roots, and signature Western artists.
+                    </p>
+                </div>
+
+                <!-- Genre Filter Tabs -->
+                <div id="genre-tabs" class="flex flex-wrap gap-2.5 mb-8" role="tablist" aria-label="Music Genres">
+                    <!-- Populated via JavaScript -->
+                </div>
+
+                <!-- Active Genre Detail Panel -->
+                <div id="genre-detail-panel" class="rounded-2xl bg-evergreen-900 border border-evergreen-700 p-6 sm:p-10 shadow-xl">
+                    <!-- Populated via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: POPULAR WESTERN SONGS RIGHT NOW -->
+        <section id="popular" class="py-16 sm:py-24 border-b border-evergreen-800 bg-evergreen-900/35">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-champagne-400">04 • Western Charts</span>
+                        <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-champagne-200 mt-2">What's Popular in the West Right Now</h2>
+                        <p class="text-champagne-300/85 mt-2 text-sm sm:text-base max-w-2xl">
+                            Leading Western tracks dominating global airplay, streaming charts, and seasonal winter playlists.
+                        </p>
+                    </div>
+
+                    <!-- Filter by Chart Category -->
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" data-chart-filter="all" class="chart-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-cranberry-800 text-champagne-200 border border-champagne-400/30 transition-all">All Hits</button>
+                        <button type="button" data-chart-filter="mainstream" class="chart-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-evergreen-800 text-champagne-300 border border-evergreen-700 hover:text-champagne-200 transition-all">Chart Toppers</button>
+                        <button type="button" data-chart-filter="holiday" class="chart-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-evergreen-800 text-champagne-300 border border-evergreen-700 hover:text-champagne-200 transition-all">Winter Classics</button>
+                    </div>
+                </div>
+
+                <!-- Popular Songs List -->
+                <div id="popular-songs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Populated via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: PERSONALIZED RECOMMENDATIONS ENGINE -->
+        <section id="recommendations" class="py-16 sm:py-24">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mb-10">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-champagne-400">05 • Curated Discovery</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-champagne-200 mt-2">Get Music Recommendations</h2>
+                    <p class="text-champagne-300/90 mt-3 text-base">
+                        Choose your current winter mood, preferred genre, and listening setting to generate tailored Western song recommendations. Save favorites directly to your personal collection.
+                    </p>
+                </div>
+
+                <!-- Interactive Recommendation Controls -->
+                <div class="rounded-2xl bg-evergreen-900 border border-evergreen-700 p-6 sm:p-8 mb-10 shadow-xl">
+                    <form id="recommendation-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
+                        <!-- Mood Selector -->
+                        <div>
+                            <label for="mood-select" class="block text-xs font-semibold uppercase tracking-wider text-champagne-400 mb-2">Current Mood</label>
+                            <select id="mood-select" class="w-full px-4 py-3 rounded-xl bg-evergreen-950 border border-evergreen-700 text-champagne-200 text-sm focus:outline-none focus:border-champagne-400">
+                                <option value="cozy">Cozy &amp; Fireside</option>
+                                <option value="melancholic">Reflective &amp; Calm</option>
+                                <option value="uplifting">Warm &amp; Uplifting</option>
+                                <option value="energetic">Vibrant &amp; Upbeat</option>
+                            </select>
+                        </div>
+
+                        <!-- Genre Preference -->
+                        <div>
+                            <label for="rec-genre-select" class="block text-xs font-semibold uppercase tracking-wider text-champagne-400 mb-2">Preferred Genre</label>
+                            <select id="rec-genre-select" class="w-full px-4 py-3 rounded-xl bg-evergreen-950 border border-evergreen-700 text-champagne-200 text-sm focus:outline-none focus:border-champagne-400">
+                                <option value="any">Any Genre</option>
+                                <option value="Pop">Pop &amp; Indie Pop</option>
+                                <option value="Indie Folk">Indie Folk &amp; Acoustic</option>
+                                <option value="Ambient">Ambient &amp; Neo-Classical</option>
+                                <option value="Jazz">Jazz &amp; Soul</option>
+                                <option value="Rock">Alternative &amp; Classic Rock</option>
+                                <option value="R&B">Contemporary R&amp;B</option>
+                                <option value="Holiday">Holiday &amp; Winter Melancholy</option>
+                            </select>
+                        </div>
+
+                        <!-- Activity / Setting -->
+                        <div>
+                            <label for="activity-select" class="block text-xs font-semibold uppercase tracking-wider text-champagne-400 mb-2">Listening Setting</label>
+                            <select id="activity-select" class="w-full px-4 py-3 rounded-xl bg-evergreen-950 border border-evergreen-700 text-champagne-200 text-sm focus:outline-none focus:border-champagne-400">
+                                <option value="evening">Quiet Winter Evening</option>
+                                <option value="focus">Reading &amp; Deep Focus</option>
+                                <option value="gathering">Dinner &amp; Gathering</option>
+                                <option value="drive">Late Night Drive</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div>
+                            <button type="submit" class="w-full py-3 px-6 rounded-xl bg-cranberry-800 hover:bg-cranberry-700 border border-champagne-400/30 text-champagne-200 font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-md">
+                                <svg class="w-4 h-4 text-champagne-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18"/>
+                                </svg>
+                                <span>Get Recommendations</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recommendation Results Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="rec-results-heading" class="font-serif text-2xl font-semibold text-champagne-200">Recommended for You</h3>
+                    <button id="shuffle-rec-btn" type="button" class="text-xs sm:text-sm font-medium text-champagne-400 hover:text-champagne-200 flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-evergreen-900 border border-evergreen-700 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 3 21 3 21 8"/>
+                            <line x1="4" y1="20" x2="21" y2="3"/>
+                            <polyline points="21 16 21 21 16 21"/>
+                            <line x1="15" y1="15" x2="21" y2="21"/>
+                        </svg>
+                        <span>Refresh Selection</span>
+                    </button>
+                </div>
+
+                <!-- Recommendation Results Grid -->
+                <div id="recommendation-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Populated via JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PERSISTENT BOTTOM AUDIO PREVIEW PLAYER -->
+    <div id="audio-player-bar" class="fixed bottom-0 inset-x-0 z-40 bg-evergreen-950/95 backdrop-blur-md border-t border-evergreen-700/90 px-4 py-3 shadow-2xl translate-y-full transition-transform duration-300" role="region" aria-label="Track Audio Preview Player">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+            <!-- Track Info & Artwork -->
+            <div class="flex items-center gap-3.5 w-full sm:w-auto min-w-0">
+                <div class="relative w-11 h-11 rounded-xl bg-evergreen-800 border border-champagne-400/30 overflow-hidden shrink-0 flex items-center justify-center">
+                    <img id="player-artwork" src="" alt="" class="w-full h-full object-cover hidden">
+                    <svg id="player-fallback-icon" class="w-5 h-5 text-champagne-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <h4 id="player-title" class="text-sm font-semibold text-champagne-200 truncate">Select a track</h4>
+                        <span id="player-source-badge" class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-cranberry-900 border border-cranberry-700 text-champagne-200 shrink-0">30s Preview</span>
+                    </div>
+                    <p id="player-artist" class="text-xs text-champagne-300/80 truncate">Artist</p>
+                </div>
+                <!-- Mobile Close Player Button -->
+                <button id="player-close-mobile" type="button" aria-label="Close player" class="sm:hidden p-2 rounded-lg text-champagne-300 hover:text-champagne-200">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Playback Controls & Scrubber -->
+            <div class="flex items-center gap-3 w-full sm:flex-1 max-w-xl">
+                <button id="player-toggle-btn" type="button" aria-label="Play or Pause" class="w-10 h-10 rounded-full bg-cranberry-800 hover:bg-cranberry-700 border border-champagne-400/40 text-champagne-200 flex items-center justify-center shrink-0 transition-colors">
+                    <svg id="player-play-svg" class="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <svg id="player-pause-svg" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16"/>
+                        <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                </button>
+
+                <span id="player-current-time" class="text-[11px] font-mono text-champagne-300 w-9 text-right shrink-0">0:00</span>
+
+                <div id="player-progress-bar" class="flex-1 h-2 bg-evergreen-800 rounded-full overflow-hidden cursor-pointer relative border border-evergreen-700" role="slider" aria-label="Seek preview" tabindex="0">
+                    <div id="player-progress-fill" class="h-full bg-champagne-400 w-0 transition-all duration-100"></div>
+                </div>
+
+                <span id="player-duration" class="text-[11px] font-mono text-champagne-300 w-9 shrink-0">0:30</span>
+            </div>
+
+            <!-- Volume & Desktop Close -->
+            <div class="hidden sm:flex items-center gap-3 shrink-0">
+                <svg class="w-4 h-4 text-champagne-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+                <input id="player-volume" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" class="w-20 accent-[#c8a97e] cursor-pointer">
+                <button id="player-close-desktop" type="button" aria-label="Close player" class="p-2 rounded-lg text-champagne-300 hover:text-champagne-200 hover:bg-evergreen-800 transition-colors ml-1">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVED COLLECTION MODAL / DRAWER -->
+    <div id="saved-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="saved-modal-title">
+        <!-- Backdrop -->
+        <div id="saved-modal-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+        
+        <!-- Drawer Panel -->
+        <div class="fixed inset-y-0 right-0 max-w-md w-full bg-evergreen-900 border-l border-evergreen-700 shadow-2xl flex flex-col z-10">
+            <div class="p-6 border-b border-evergreen-700 flex items-center justify-between">
+                <div>
+                    <h3 id="saved-modal-title" class="font-serif text-2xl font-semibold text-champagne-200">Your Saved Collection</h3>
+                    <p class="text-xs text-champagne-300/80 mt-0.5">Stored locally in your browser</p>
+                </div>
+                <button id="close-saved-btn" type="button" aria-label="Close modal" class="p-2.5 rounded-xl bg-evergreen-800 text-champagne-300 hover:text-champagne-200 border border-evergreen-700">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Saved Songs List -->
+            <div id="saved-songs-list" class="flex-1 overflow-y-auto p-6 space-y-3">
+                <!-- Populated via JavaScript -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-5 border-t border-evergreen-700 bg-evergreen-950/60 flex items-center justify-between">
+                <button id="clear-saved-btn" type="button" class="text-xs font-medium text-cranberry-600 hover:text-champagne-200 transition-colors py-2 px-3 rounded-lg">
+                    Clear All Saved
+                </button>
+                <button id="done-saved-btn" type="button" class="px-5 py-2.5 rounded-xl bg-evergreen-800 hover:bg-evergreen-700 text-champagne-200 text-sm font-medium border border-evergreen-600">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-evergreen-800 bg-evergreen-950 py-12 pb-28">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+                <span class="font-serif text-xl font-semibold text-champagne-200">everything about music</span>
+                <p class="text-xs text-champagne-300/70 mt-1">An editorial guide to sound, Western charts, and curated winter listening.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-xs text-champagne-300/80">
+                <a href="#essence" class="hover:text-champagne-400 transition-colors">What is Music</a>
+                <a href="#types" class="hover:text-champagne-400 transition-colors">Types</a>
+                <a href="#genres" class="hover:text-champagne-400 transition-colors">Genres</a>
+                <a href="#popular" class="hover:text-champagne-400 transition-colors">Western Charts</a>
+                <a href="#recommendations" class="hover:text-champagne-400 transition-colors">Recommendations</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- APPLICATION LOGIC (Self-contained Vanilla JS + Web Audio API Synthesizer) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // 1. CURATED DATA REPOSITORY (Western Music Only)
+            // ==========================================
+            const GENRES_DATA = [
+                {
+                    id: 'jazz',
+                    name: 'Jazz & Swing',
+                    era: 'Late 19th Century – Present',
+                    origin: 'New Orleans, United States',
+                    description: 'Built on improvisation, syncopated rhythms, and expressive blue notes. During the winter season, warm brass arrangements and brush-drum swing define classic holiday lounge atmospheres.',
+                    instruments: ['Double Bass', 'Saxophone', 'Grand Piano', 'Muted Trumpet', 'Brush Drums'],
+                    artists: ['Frank Sinatra', 'Ella Fitzgerald', 'Nat King Cole', 'Miles Davis', 'Norah Jones'],
+                    chordFreqs: [261.63, 329.63, 392.00, 493.88] // Cmaj7
+                },
+                {
+                    id: 'pop',
+                    name: 'Contemporary Pop',
+                    era: '1950s – Present',
+                    origin: 'United States & United Kingdom',
+                    description: 'Crafted around memorable vocal hooks, crisp production, and relatable storytelling. Modern Western pop blends analog warmth with polished electronic textures.',
+                    instruments: ['Lead Vocals', 'Synthesizers', 'Drum Machine', 'Electric Guitar', 'Bass'],
+                    artists: ['Taylor Swift', 'Sabrina Carpenter', 'Billie Eilish', 'Bruno Mars', 'Ariana Grande'],
+                    chordFreqs: [293.66, 349.23, 440.00, 523.25] // Dm7
+                },
+                {
+                    id: 'rock',
+                    name: 'Alternative & Classic Rock',
+                    era: '1950s – Present',
+                    origin: 'United States & United Kingdom',
+                    description: 'Driven by electric guitars, live acoustic drums, and raw emotional conviction. Ranges from anthemic arena classics to intimate, poetic indie-folk rock.',
+                    instruments: ['Electric Guitar', 'Acoustic Guitar', 'Bass Guitar', 'Drum Kit', 'Hammond Organ'],
+                    artists: ['Fleetwood Mac', 'Coldplay', 'The Killers', 'Hozier', 'Arctic Monkeys'],
+                    chordFreqs: [196.00, 246.94, 293.66, 392.00] // G major
+                },
+                {
+                    id: 'rnb',
+                    name: 'Soul & R&B',
+                    era: '1940s – Present',
+                    origin: 'African American Communities, USA',
+                    description: 'Rich vocal melisma, deep groove, and lush chord progressions. Contemporary R&B emphasizes intimacy, velvet basslines, and atmospheric harmonies.',
+                    instruments: ['Rhodes Electric Piano', 'Bass Guitar', 'Smooth Vocals', '808 Sub', 'Strings'],
+                    artists: ['SZA', 'The Weeknd', 'Alicia Keys', 'Frank Ocean', 'Leon Bridges'],
+                    chordFreqs: [220.00, 261.63, 329.63, 392.00] // Am7
+                },
+                {
+                    id: 'classical',
+                    name: 'Classical & Neo-Classical',
+                    era: '1750 – Present',
+                    origin: 'Western Europe',
+                    description: 'Structural elegance and orchestral depth. From Tchaikovsky’s winter ballet suites to modern minimalist solo piano compositions designed for quiet contemplation.',
+                    instruments: ['Violin Section', 'Cello', 'Concert Grand Piano', 'French Horn', 'Harp'],
+                    artists: ['Pyotr Tchaikovsky', 'Max Richter', 'Ludovico Einaudi', 'Clara Schumann', 'Ólafur Arnalds'],
+                    chordFreqs: [174.61, 220.00, 261.63, 329.63] // Fmaj7
+                },
+                {
+                    id: 'indie-folk',
+                    name: 'Indie Folk & Sad Acoustic',
+                    era: '2000s – Present',
+                    origin: 'North America & United Kingdom',
+                    description: 'Intimate storytelling stripped back to fingerpicked acoustic guitars, muted upright pianos, and hushed, vulnerable vocals. Ideal for quiet snowfalls and late-night reflection.',
+                    instruments: ['Acoustic Guitar', 'Felt Piano', 'Cello', 'Pedal Steel', 'Soft Harmonies'],
+                    artists: ['Malcolm Todd', 'Clairo', 'Beabadoobee', 'Phoebe Bridgers', 'The Marías'],
+                    chordFreqs: [220.00, 261.63, 329.63, 493.88] // Am9
+                },
+                {
+                    id: 'ambient',
+                    name: 'Ambient & Downtempo',
+                    era: '1970s – Present',
+                    origin: 'United Kingdom & Europe',
+                    description: 'Atmosphere over traditional beat structures. Built from warm analog tape loops, spacious reverb, and slow-evolving harmonic textures that encourage stillness and deep focus.',
+                    instruments: ['Analog Synthesizers', 'Tape Loops', 'Electric Piano', 'Field Recordings', 'Strings'],
+                    artists: ['Brian Eno', 'Nils Frahm', 'Cigarettes After Sex', 'Hammock', 'Aphex Twin'],
+                    chordFreqs: [196.00, 293.66, 369.99, 440.00] // Gmaj9
+                },
+                {
+                    id: 'blues',
+                    name: 'Blues & Slow Ballads',
+                    era: 'Late 19th Century – Present',
+                    origin: 'Deep South, United States',
+                    description: 'Rooted in raw emotional honesty, twelve-bar progressions, and expressive string bending. Slow winter blues and torch ballads capture longing, solitude, and quiet resilience.',
+                    instruments: ['Hollow-Body Guitar', 'Harmonica', 'Upright Piano', 'Upright Bass', 'Brushed Snare'],
+                    artists: ['B.B. King', 'Etta James', 'Ray Charles', 'Beth Hart', 'Chris Stapleton'],
+                    chordFreqs: [164.81, 207.65, 246.94, 293.66] // E7
+                }
+            ];
+
+            const POPULAR_WESTERN_SONGS = [
+                {
+                    id: 'pop-1',
+                    rank: '01',
+                    title: 'Die With A Smile',
+                    artist: 'Lady Gaga & Bruno Mars',
+                    genre: 'Pop / Soul',
+                    category: 'mainstream',
+                    duration: '4:11',
+                    notes: [293.66, 369.99, 440.00]
+                },
+                {
+                    id: 'pop-2',
+                    rank: '02',
+                    title: 'Birds of a Feather',
+                    artist: 'Billie Eilish',
+                    genre: 'Alt-Pop',
+                    category: 'mainstream',
+                    duration: '3:30',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'pop-3',
+                    rank: '03',
+                    title: 'Espresso',
+                    artist: 'Sabrina Carpenter',
+                    genre: 'Pop / Nu-Disco',
+                    category: 'mainstream',
+                    duration: '2:55',
+                    notes: [329.63, 392.00, 493.88]
+                },
+                {
+                    id: 'pop-4',
+                    rank: '04',
+                    title: 'All I Want for Christmas Is You',
+                    artist: 'Mariah Carey',
+                    genre: 'Holiday Pop',
+                    category: 'holiday',
+                    duration: '4:01',
+                    notes: [392.00, 493.88, 587.33]
+                },
+                {
+                    id: 'pop-5',
+                    rank: '05',
+                    title: 'Last Christmas',
+                    artist: 'Wham!',
+                    genre: 'Synth-Pop / Holiday',
+                    category: 'holiday',
+                    duration: '4:22',
+                    notes: [293.66, 349.23, 440.00]
+                },
+                {
+                    id: 'pop-6',
+                    rank: '06',
+                    title: 'Earrings',
+                    artist: 'Malcolm Todd',
+                    genre: 'Bedroom Pop / Indie',
+                    category: 'mainstream',
+                    duration: '2:48',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'pop-7',
+                    rank: '07',
+                    title: 'The Christmas Song (Chestnuts Roasting)',
+                    artist: 'Nat King Cole',
+                    genre: 'Traditional Jazz',
+                    category: 'holiday',
+                    duration: '3:12',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'pop-8',
+                    rank: '08',
+                    title: 'Lose Control',
+                    artist: 'Teddy Swims',
+                    genre: 'Pop Soul',
+                    category: 'mainstream',
+                    duration: '3:30',
+                    notes: [246.94, 293.66, 369.99]
+                },
+                {
+                    id: 'pop-9',
+                    rank: '09',
+                    title: "Merry Christmas, Please Don't Call",
+                    artist: 'Bleachers',
+                    genre: 'Indie / Sad Holiday',
+                    category: 'holiday',
+                    duration: '3:16',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'pop-10',
+                    rank: '10',
+                    title: 'Heroes',
+                    artist: 'David Bowie',
+                    genre: 'Art Rock / Classic',
+                    category: 'mainstream',
+                    duration: '6:11',
+                    notes: [293.66, 369.99, 440.00]
+                }
+            ];
+
+            const RECOMMENDATION_CATALOG = [
+                {
+                    id: 'rec-1',
+                    title: 'Have Yourself a Merry Little Christmas',
+                    artist: 'Frank Sinatra',
+                    genre: 'Jazz',
+                    moods: ['cozy', 'melancholic'],
+                    activities: ['evening', 'gathering'],
+                    reason: 'Warm orchestral strings and Sinatra’s intimate baritone create an unmatched fireside atmosphere.',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'rec-2',
+                    title: 'River',
+                    artist: 'Joni Mitchell',
+                    genre: 'Rock',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'focus'],
+                    reason: 'A poignant solo piano classic blending winter introspection with poetic acoustic songwriting.',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'rec-3',
+                    title: 'Snowman',
+                    artist: 'Sia',
+                    genre: 'Pop',
+                    moods: ['cozy', 'uplifting'],
+                    activities: ['evening', 'drive'],
+                    reason: 'Gentle mid-tempo percussion and soulful vocals tailored for quiet snowy evenings.',
+                    notes: [293.66, 349.23, 440.00]
+                },
+                {
+                    id: 'rec-4',
+                    title: 'Winter Wonderland',
+                    artist: 'Ella Fitzgerald',
+                    genre: 'Jazz',
+                    moods: ['uplifting', 'energetic'],
+                    activities: ['gathering', 'drive'],
+                    reason: 'Crisp swing rhythm and radiant vocal phrasing bring effortless warmth to any winter gathering.',
+                    notes: [349.23, 440.00, 523.25]
+                },
+                {
+                    id: 'rec-5',
+                    title: 'cardigan',
+                    artist: 'Taylor Swift',
+                    genre: 'Pop',
+                    moods: ['cozy', 'melancholic'],
+                    activities: ['focus', 'evening'],
+                    reason: 'Soft felt piano and nostalgic lyricism ideal for reading beside a window.',
+                    notes: [261.63, 311.13, 392.00]
+                },
+                {
+                    id: 'rec-6',
+                    title: 'Blinding Lights',
+                    artist: 'The Weeknd',
+                    genre: 'R&B',
+                    moods: ['energetic', 'uplifting'],
+                    activities: ['drive', 'gathering'],
+                    reason: 'Driving analog synth pulses engineered for late-night highway drives under city lights.',
+                    notes: [293.66, 349.23, 440.00]
+                },
+                {
+                    id: 'rec-7',
+                    title: 'White Winter Hymnal',
+                    artist: 'Fleet Foxes',
+                    genre: 'Rock',
+                    moods: ['cozy', 'uplifting'],
+                    activities: ['focus', 'evening'],
+                    reason: 'Layered baroque-folk vocal harmonies evoke crisp December mornings.',
+                    notes: [329.63, 415.30, 493.88]
+                },
+                {
+                    id: 'rec-8',
+                    title: 'This Christmas',
+                    artist: 'Donny Hathaway',
+                    genre: 'R&B',
+                    moods: ['uplifting', 'energetic'],
+                    activities: ['gathering', 'drive'],
+                    reason: 'Joyful brass, electric piano grooves, and timeless soul energy.',
+                    notes: [349.23, 440.00, 523.25]
+                },
+                {
+                    id: 'rec-10',
+                    title: 'Snooze',
+                    artist: 'SZA',
+                    genre: 'R&B',
+                    moods: ['cozy', 'melancholic'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Hypnotic, warm synth pads and relaxed percussion for unwinding after dusk.',
+                    notes: [246.94, 293.66, 369.99]
+                },
+                {
+                    id: 'rec-11',
+                    title: 'Dreams',
+                    artist: 'Fleetwood Mac',
+                    genre: 'Rock',
+                    moods: ['melancholic', 'uplifting'],
+                    activities: ['drive', 'focus'],
+                    reason: 'Effortless rhythmic flow and timeless analog warmth that fits every season.',
+                    notes: [349.23, 440.00, 523.25]
+                },
+                {
+                    id: 'rec-12',
+                    title: 'Santa Tell Me',
+                    artist: 'Ariana Grande',
+                    genre: 'Holiday',
+                    moods: ['energetic', 'uplifting'],
+                    activities: ['gathering', 'drive'],
+                    reason: 'Bright R&B-infused pop sleigh bells with crisp contemporary production.',
+                    notes: [392.00, 493.88, 587.33]
+                },
+                {
+                    id: 'rec-13',
+                    title: "Merry Christmas, Please Don't Call",
+                    artist: 'Bleachers',
+                    genre: 'Holiday',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'drive'],
+                    reason: 'A bittersweet, cinematic winter ballad about quiet heartbreak and setting emotional boundaries during the holidays.',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'rec-14',
+                    title: 'Christmas Song',
+                    artist: 'Phoebe Bridgers',
+                    genre: 'Indie Folk',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Hushed acoustic guitar and poignant, understated vocals capturing the lonelier side of December.',
+                    notes: [196.00, 246.94, 293.66]
+                },
+                {
+                    id: 'rec-15',
+                    title: 'Holocene',
+                    artist: 'Bon Iver',
+                    genre: 'Indie Folk',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['focus', 'evening'],
+                    reason: 'Delicate fingerpicked guitar, muted brass, and expansive winter stillness.',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'rec-16',
+                    title: 'Apocalypse',
+                    artist: 'Cigarettes After Sex',
+                    genre: 'Ambient',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'drive'],
+                    reason: 'Slow-motion reverb-drenched guitars and hypnotic, tranquil vocals made for midnight listening.',
+                    notes: [174.61, 220.00, 261.63]
+                },
+                {
+                    id: 'rec-17',
+                    title: 'On the Nature of Daylight',
+                    artist: 'Max Richter',
+                    genre: 'Ambient',
+                    moods: ['melancholic'],
+                    activities: ['focus', 'evening'],
+                    reason: 'Deep, mournful string harmonies that create an atmosphere of profound calm and reflection.',
+                    notes: [233.08, 277.18, 349.23]
+                },
+                {
+                    id: 'rec-18',
+                    title: 'Blue in Green',
+                    artist: 'Miles Davis',
+                    genre: 'Jazz',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Bill Evans’s modal piano voicings and muted trumpet deliver timeless, quiet winter introspection.',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'rec-19',
+                    title: 'Fourth of July',
+                    artist: 'Sufjan Stevens',
+                    genre: 'Indie Folk',
+                    moods: ['melancholic'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Whisper-quiet piano and tender ambient textures reflecting on memory, loss, and stillness.',
+                    notes: [246.94, 293.66, 369.99]
+                },
+                {
+                    id: 'rec-20',
+                    title: 'Avril 14th',
+                    artist: 'Aphex Twin',
+                    genre: 'Ambient',
+                    moods: ['cozy', 'melancholic'],
+                    activities: ['focus', 'evening'],
+                    reason: 'A fragile, intimate solo mechanical-piano miniature full of quiet warmth.',
+                    notes: [261.63, 311.13, 392.00]
+                },
+                {
+                    id: 'rec-21',
+                    title: 'Liability',
+                    artist: 'Lorde',
+                    genre: 'Pop',
+                    moods: ['melancholic'],
+                    activities: ['evening', 'drive'],
+                    reason: 'Sparse, confessional piano balladry that resonates deeply on quiet winter nights.',
+                    notes: [293.66, 349.23, 440.00]
+                },
+                {
+                    id: 'rec-22',
+                    title: 'Come Away With Me',
+                    artist: 'Norah Jones',
+                    genre: 'Jazz',
+                    moods: ['cozy', 'uplifting'],
+                    activities: ['evening', 'gathering'],
+                    reason: 'Velvety piano and unhurried vocal warmth tailored for calm candlelit evenings.',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'rec-23',
+                    title: 'Earrings',
+                    artist: 'Malcolm Todd',
+                    genre: 'Indie Folk',
+                    moods: ['cozy', 'uplifting', 'energetic'],
+                    activities: ['drive', 'evening'],
+                    reason: 'Sun-drenched bedroom-pop basslines, groovy percussion, and effortless modern indie charm.',
+                    notes: [246.94, 293.66, 369.99]
+                },
+                {
+                    id: 'rec-24',
+                    title: 'Juna',
+                    artist: 'Clairo',
+                    genre: 'Indie Folk',
+                    moods: ['cozy', 'uplifting'],
+                    activities: ['evening', 'gathering'],
+                    reason: 'Warm tape-saturated drums, soft horns, and intimate modern indie songwriting.',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'rec-25',
+                    title: 'Glue Song',
+                    artist: 'Beabadoobee',
+                    genre: 'Indie Folk',
+                    moods: ['cozy', 'uplifting'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Tender acoustic strumming and nostalgic Gen-Z bedroom-pop sincerity.',
+                    notes: [293.66, 369.99, 440.00]
+                },
+                {
+                    id: 'rec-26',
+                    title: 'No One Noticed',
+                    artist: 'The Marías',
+                    genre: 'Ambient',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['drive', 'evening'],
+                    reason: 'Dreamy late-night indie basslines and hypnotic, velvety vocals.',
+                    notes: [220.00, 261.63, 329.63]
+                },
+                {
+                    id: 'rec-27',
+                    title: 'Babydoll',
+                    artist: 'Dominic Fike',
+                    genre: 'Pop',
+                    moods: ['uplifting', 'energetic'],
+                    activities: ['drive', 'gathering'],
+                    reason: 'Crisp alt-pop guitar riffs blended with laid-back melodic hooks.',
+                    notes: [329.63, 392.00, 493.88]
+                },
+                {
+                    id: 'rec-28',
+                    title: 'Dark Red',
+                    artist: 'Steve Lacy',
+                    genre: 'R&B',
+                    moods: ['melancholic', 'energetic'],
+                    activities: ['drive', 'evening'],
+                    reason: 'Lo-fi funk guitar loops and raw emotional vulnerability.',
+                    notes: [196.00, 246.94, 293.66]
+                },
+                {
+                    id: 'rec-29',
+                    title: 'Are You Bored Yet? (feat. Clairo)',
+                    artist: 'Wallows',
+                    genre: 'Rock',
+                    moods: ['uplifting', 'energetic'],
+                    activities: ['drive', 'gathering'],
+                    reason: 'Upbeat indie-rock synths and youthful nostalgia built for late-night drives.',
+                    notes: [261.63, 329.63, 392.00]
+                },
+                {
+                    id: 'rec-30',
+                    title: 'Lovers Rock',
+                    artist: 'TV Girl',
+                    genre: 'Pop',
+                    moods: ['melancholic', 'cozy'],
+                    activities: ['evening', 'focus'],
+                    reason: 'Hazy sample-driven indie pop with bittersweet retro warmth.',
+                    notes: [220.00, 261.63, 329.63]
+                }
+            ];
+
+            // ==========================================
+            // 2. STATE MANAGEMENT & LOCALSTORAGE
+            // ==========================================
+            const STORAGE_KEY = 'everything_about_music_saved_v1';
+            let savedTracks = [];
+            let activeGenreId = GENRES_DATA[0].id;
+            let activeChartFilter = 'all';
+            let currentPlayingId = null;
+            let isAudioPlaying = false;
+            let loadingTrackId = null;
+            const previewCache = new Map();
+
+            function loadSavedTracks() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    savedTracks = raw ? JSON.parse(raw) : [];
+                } catch (err) {
+                    console.warn('Could not access localStorage:', err);
+                    savedTracks = [];
+                }
+                updateSavedBadge();
+            }
+
+            function persistSavedTracks() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTracks));
+                } catch (err) {
+                    showToast('Unable to save to browser storage.', 'error');
+                }
+                updateSavedBadge();
+            }
+
+            function isTrackSaved(id) {
+                return savedTracks.some(item => item.id === id);
+            }
+
+            function toggleSaveTrack(trackObj) {
+                const exists = isTrackSaved(trackObj.id);
+                if (exists) {
+                    savedTracks = savedTracks.filter(item => item.id !== trackObj.id);
+                    showToast(`Removed "${trackObj.title}" from Saved`);
+                } else {
+                    savedTracks.unshift({
+                        id: trackObj.id,
+                        title: trackObj.title,
+                        artist: trackObj.artist,
+                        genre: trackObj.genre
+                    });
+                    showToast(`Saved "${trackObj.title}" to your collection`);
+                }
+                persistSavedTracks();
+                renderPopularSongs();
+                renderCurrentRecommendations();
+                renderSavedDrawer();
+            }
+
+            function updateSavedBadge() {
+                const badge = document.getElementById('saved-count-badge');
+                if (badge) badge.textContent = savedTracks.length;
+            }
+
+            // ==========================================
+            // 3. REAL 30-SEC SONG PREVIEW PLAYER + WEB AUDIO FALLBACK
+            // ==========================================
+            let audioCtx = null;
+            const htmlAudio = new Audio();
+            htmlAudio.crossOrigin = 'anonymous';
+            htmlAudio.volume = 0.8;
+
+            const playerBar = document.getElementById('audio-player-bar');
+            const playerTitle = document.getElementById('player-title');
+            const playerArtist = document.getElementById('player-artist');
+            const playerArtwork = document.getElementById('player-artwork');
+            const playerFallbackIcon = document.getElementById('player-fallback-icon');
+            const playerSourceBadge = document.getElementById('player-source-badge');
+            const playerToggleBtn = document.getElementById('player-toggle-btn');
+            const playerPlaySvg = document.getElementById('player-play-svg');
+            const playerPauseSvg = document.getElementById('player-pause-svg');
+            const playerCurrentTime = document.getElementById('player-current-time');
+            const playerDuration = document.getElementById('player-duration');
+            const playerProgressBar = document.getElementById('player-progress-bar');
+            const playerProgressFill = document.getElementById('player-progress-fill');
+            const playerVolume = document.getElementById('player-volume');
+
+            function formatSeconds(sec) {
+                if (!Number.isFinite(sec) || sec < 0) return '0:00';
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            }
+
+            function syncPlayerUI() {
+                if (isAudioPlaying) {
+                    playerPlaySvg.classList.add('hidden');
+                    playerPauseSvg.classList.remove('hidden');
+                } else {
+                    playerPlaySvg.classList.remove('hidden');
+                    playerPauseSvg.classList.add('hidden');
+                }
+                renderPopularSongs();
+                renderCurrentRecommendations();
+                renderSavedDrawer();
+            }
+
+            async function fetchTrackPreviewFromItunes(title, artist) {
+                const cacheKey = `${title}::${artist}`.toLowerCase();
+                if (previewCache.has(cacheKey)) {
+                    return previewCache.get(cacheKey);
+                }
+                const cleanArtist = artist.split('&')[0].trim();
+                const query = encodeURIComponent(`${title} ${cleanArtist}`);
+                const url = `https://itunes.apple.com/search?term=${query}&media=music&entity=song&limit=5`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const match = data.results.find(item =>
+                        item.previewUrl &&
+                        item.trackName &&
+                        item.trackName.toLowerCase().includes(title.toLowerCase().slice(0, 8))
+                    ) || data.results.find(item => item.previewUrl);
+
+                    if (match && match.previewUrl) {
+                        const result = {
+                            previewUrl: match.previewUrl,
+                            artworkUrl: match.artworkUrl100 || null
+                        };
+                        previewCache.set(cacheKey, result);
+                        return result;
+                    }
+                }
+                throw new Error('Preview not found');
+            }
+
+            async function playSongSnippet(track) {
+                // Toggle pause/resume if clicking the currently loaded track
+                if (currentPlayingId === track.id && htmlAudio.src) {
+                    if (htmlAudio.paused) {
+                        try {
+                            await htmlAudio.play();
+                            isAudioPlaying = true;
+                        } catch (e) {
+                            showToast('Playback blocked by browser.', 'error');
+                        }
+                    } else {
+                        htmlAudio.pause();
+                        isAudioPlaying = false;
+                    }
+                    syncPlayerUI();
+                    return;
+                }
+
+                // Stop any ongoing audio
+                htmlAudio.pause();
+                htmlAudio.currentTime = 0;
+                loadingTrackId = track.id;
+                currentPlayingId = track.id;
+                isAudioPlaying = false;
+                syncPlayerUI();
+
+                // Show player bar immediately with loading state
+                playerBar.classList.remove('translate-y-full');
+                playerTitle.textContent = track.title;
+                playerArtist.textContent = track.artist;
+                playerSourceBadge.textContent = 'Loading...';
+                playerProgressFill.style.width = '0%';
+                playerCurrentTime.textContent = '0:00';
+                playerArtwork.classList.add('hidden');
+                playerFallbackIcon.classList.remove('hidden');
+
+                try {
+                    const previewData = await fetchTrackPreviewFromItunes(track.title, track.artist);
+                    // Ensure user hasn't clicked another track while loading
+                    if (loadingTrackId !== track.id) return;
+
+                    loadingTrackId = null;
+                    htmlAudio.src = previewData.previewUrl;
+                    playerSourceBadge.textContent = '30s Audio Preview';
+
+                    if (previewData.artworkUrl) {
+                        playerArtwork.src = previewData.artworkUrl;
+                        playerArtwork.onload = () => {
+                            playerArtwork.classList.remove('hidden');
+                            playerFallbackIcon.classList.add('hidden');
+                        };
+                    }
+
+                    await htmlAudio.play();
+                    isAudioPlaying = true;
+                    syncPlayerUI();
+                } catch (err) {
+                    if (loadingTrackId !== track.id) return;
+                    loadingTrackId = null;
+                    isAudioPlaying = false;
+                    playerSourceBadge.textContent = 'Synth Chord Fallback';
+                    syncPlayerUI();
+                    playHarmonicPreview(track.notes || [261.63, 329.63, 392.00]);
+                    showToast(`Playing harmonic chord for "${track.title}"`);
+                }
+            }
+
+            htmlAudio.addEventListener('timeupdate', () => {
+                if (!htmlAudio.duration) return;
+                const pct = (htmlAudio.currentTime / htmlAudio.duration) * 100;
+                playerProgressFill.style.width = `${pct}%`;
+                playerCurrentTime.textContent = formatSeconds(htmlAudio.currentTime);
+                playerDuration.textContent = formatSeconds(htmlAudio.duration);
+            });
+
+            htmlAudio.addEventListener('ended', () => {
+                isAudioPlaying = false;
+                playerProgressFill.style.width = '0%';
+                playerCurrentTime.textContent = '0:00';
+                syncPlayerUI();
+            });
+
+            playerToggleBtn.addEventListener('click', async () => {
+                if (!htmlAudio.src) return;
+                if (htmlAudio.paused) {
+                    await htmlAudio.play();
+                    isAudioPlaying = true;
+                } else {
+                    htmlAudio.pause();
+                    isAudioPlaying = false;
+                }
+                syncPlayerUI();
+            });
+
+            playerProgressBar.addEventListener('click', (e) => {
+                if (!htmlAudio.duration) return;
+                const rect = playerProgressBar.getBoundingClientRect();
+                const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                htmlAudio.currentTime = ratio * htmlAudio.duration;
+            });
+
+            playerVolume.addEventListener('input', (e) => {
+                htmlAudio.volume = parseFloat(e.target.value);
+            });
+
+            function closeAudioPlayer() {
+                htmlAudio.pause();
+                htmlAudio.src = '';
+                currentPlayingId = null;
+                isAudioPlaying = false;
+                loadingTrackId = null;
+                playerBar.classList.add('translate-y-full');
+                syncPlayerUI();
+            }
+
+            document.getElementById('player-close-desktop').addEventListener('click', closeAudioPlayer);
+            document.getElementById('player-close-mobile').addEventListener('click', closeAudioPlayer);
+
+            function getAudioContext() {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                return audioCtx;
+            }
+
+            // Plays a warm, mellow electric-piano / chime chord preview
+            function playHarmonicPreview(frequencies = [261.63, 329.63, 392.00]) {
+                try {
+                    const ctx = getAudioContext();
+                    const now = ctx.currentTime;
+
+                    frequencies.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        const filter = ctx.createBiquadFilter();
+
+                        // Warm triangle wave softened by lowpass filter
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(950, now);
+
+                        gain.gain.setValueAtTime(0.001, now + idx * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.08, now + idx * 0.09 + 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.09 + 1.6);
+
+                        osc.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        osc.start(now + idx * 0.09);
+                        osc.stop(now + idx * 0.09 + 1.7);
+                    });
+                } catch (e) {
+                    showToast('Audio preview unavailable in this browser.', 'error');
+                }
+            }
+
+            // Hero Acoustic Chamber Trigger
+            const heroPlayBtn = document.getElementById('hero-play-btn');
+            const vinylDisc = document.getElementById('vinyl-disc');
+            const synthStatusBadge = document.getElementById('synth-status-badge');
+            const heroPlayText = document.getElementById('hero-play-text');
+
+            heroPlayBtn.addEventListener('click', () => {
+                // Warm Winter Cmaj9 Arpeggio
+                playHarmonicPreview([261.63, 329.63, 392.00, 493.88, 587.33]);
+                vinylDisc.classList.add('rotate-45', 'border-champagne-400');
+                synthStatusBadge.textContent = 'Resonating';
+                synthStatusBadge.classList.replace('text-champagne-300', 'text-champagne-400');
+                heroPlayText.textContent = 'Playing Chord...';
+
+                setTimeout(() => {
+                    vinylDisc.classList.remove('rotate-45', 'border-champagne-400');
+                    synthStatusBadge.textContent = 'Standby';
+                    synthStatusBadge.classList.replace('text-champagne-400', 'text-champagne-300');
+                    heroPlayText.textContent = 'Play Winter Chord';
+                }, 1750);
+            });
+
+            // Single tone buttons in "What is Music" section
+            document.querySelectorAll('.play-tone-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const freq = parseFloat(btn.getAttribute('data-note'));
+                    playHarmonicPreview([freq]);
+                });
+            });
+
+            // ==========================================
+            // 4. TOAST FEEDBACK SYSTEM
+            // ==========================================
+            function showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const borderClass = type === 'error' ? 'border-cranberry-600' : 'border-champagne-400/40';
+                
+                toast.className = `pointer-events-auto px-4 py-3 rounded-xl bg-evergreen-900/95 backdrop-blur-md border ${borderClass} text-champagne-200 text-xs sm:text-sm shadow-xl flex items-center justify-between gap-3 fade-in`;
+                toast.innerHTML = `
+                    <span>${message}</span>
+                    <span class="w-2 h-2 rounded-full ${type === 'error' ? 'bg-cranberry-600' : 'bg-champagne-400'} shrink-0"></span>
+                `;
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(6px)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2800);
+            }
+
+            // ==========================================
+            // 5. RENDER GENRES EXPLORER
+            // ==========================================
+            function renderGenres() {
+                const tabsContainer = document.getElementById('genre-tabs');
+                const panelContainer = document.getElementById('genre-detail-panel');
+
+                tabsContainer.innerHTML = GENRES_DATA.map(genre => {
+                    const isActive = genre.id === activeGenreId;
+                    const activeClasses = isActive
+                        ? 'bg-cranberry-800 text-champagne-200 border-champagne-400/40 shadow-md'
+                        : 'bg-evergreen-900 text-champagne-300 border-evergreen-700 hover:bg-evergreen-800 hover:text-champagne-200';
+                    return `
+                        <button type="button" role="tab" aria-selected="${isActive}" data-genre-id="${genre.id}"
+                            class="genre-tab-btn px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all ${activeClasses}">
+                            ${genre.name}
+                        </button>
+                    `;
+                }).join('');
+
+                const currentGenre = GENRES_DATA.find(g => g.id === activeGenreId) || GENRES_DATA[0];
+
+                panelContainer.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start fade-in">
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="flex flex-wrap items-center gap-3 text-xs text-champagne-400 font-medium">
+                                <span class="px-2.5 py-1 rounded-md bg-evergreen-800 border border-evergreen-700">${currentGenre.era}</span>
+                                <span>Origin: ${currentGenre.origin}</span>
+                            </div>
+                            <h3 class="font-serif text-3xl font-semibold text-champagne-200">${currentGenre.name}</h3>
+                            <p class="text-champagne-300/90 text-sm sm:text-base leading-relaxed">
+                                ${currentGenre.description}
+                            </p>
+                            <div class="pt-3">
+                                <button type="button" id="play-genre-chord-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-evergreen-800 hover:bg-evergreen-700 border border-champagne-400/30 text-champagne-200 text-xs sm:text-sm font-medium transition-colors">
+                                    <svg class="w-4 h-4 text-champagne-400" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    <span>Audition Characteristic Chord</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5 bg-evergreen-950/60 p-5 rounded-xl border border-evergreen-800">
+                            <div>
+                                <h4 class="text-xs uppercase tracking-wider text-champagne-400 font-semibold mb-2.5">Key Instrumentation</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${currentGenre.instruments.map(inst => `
+                                        <span class="text-xs px-2.5 py-1 rounded-lg bg-evergreen-900 border border-evergreen-700 text-champagne-200">${inst}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs uppercase tracking-wider text-champagne-400 font-semibold mb-2.5">Iconic Western Artists</h4>
+                                <p class="text-sm text-champagne-300 leading-relaxed">
+                                    ${currentGenre.artists.join(' • ')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Attach tab listeners
+                document.querySelectorAll('.genre-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        activeGenreId = btn.getAttribute('data-genre-id');
+                        renderGenres();
+                    });
+                });
+
+                // Attach genre chord preview listener
+                const chordBtn = document.getElementById('play-genre-chord-btn');
+                if (chordBtn) {
+                    chordBtn.addEventListener('click', () => {
+                        playHarmonicPreview(currentGenre.chordFreqs);
+                    });
+                }
+            }
+
+            // ==========================================
+            // 6. RENDER POPULAR WESTERN SONGS
+            // ==========================================
+            function renderPopularSongs() {
+                const grid = document.getElementById('popular-songs-grid');
+                const filtered = activeChartFilter === 'all'
+                    ? POPULAR_WESTERN_SONGS
+                    : POPULAR_WESTERN_SONGS.filter(song => song.category === activeChartFilter);
+
+                grid.innerHTML = filtered.map(song => {
+                    const saved = isTrackSaved(song.id);
+                    const isCurrent = currentPlayingId === song.id;
+                    const isPlaying = isCurrent && isAudioPlaying;
+                    const isLoading = loadingTrackId === song.id;
+
+                    return `
+                        <div class="rounded-2xl bg-evergreen-900 border ${isCurrent ? 'border-champagne-400/60' : 'border-evergreen-700/80'} p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-champagne-400/40 transition-all">
+                            <div class="flex items-center gap-4 min-w-0">
+                                <span class="font-serif text-xl sm:text-2xl font-bold text-champagne-400/80 w-7 shrink-0 text-center">${song.rank}</span>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-semibold text-champagne-200 text-sm sm:text-base truncate">${song.title}</h3>
+                                        ${isPlaying ? `
+                                            <span class="inline-flex items-end gap-0.5 h-4 shrink-0" aria-label="Playing">
+                                                <span class="eq-bar"></span>
+                                                <span class="eq-bar"></span>
+                                                <span class="eq-bar"></span>
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-champagne-300/80 truncate">${song.artist}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[11px] px-2 py-0.5 rounded bg-evergreen-800 text-champagne-300">${song.genre}</span>
+                                        <span class="text-[11px] text-champagne-400/70">${song.duration}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" data-play-song="${song.id}" aria-label="${isPlaying ? 'Pause' : 'Listen to snippet of'} ${song.title}"
+                                    class="px-3 py-2.5 rounded-xl ${isCurrent ? 'bg-cranberry-800 border-champagne-400/40' : 'bg-evergreen-800 hover:bg-evergreen-700 border-evergreen-600'} border text-champagne-200 text-xs font-medium flex items-center gap-1.5 transition-colors">
+                                    ${isPlaying ? `
+                                        <svg class="w-3.5 h-3.5 text-champagne-200" viewBox="0 0 24 24" fill="currentColor">
+                                            <rect x="6" y="4" width="4" height="16"/>
+                                            <rect x="14" y="4" width="4" height="16"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Pause</span>
+                                    ` : `
+                                        <svg class="w-3.5 h-3.5 text-champagne-400" viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="5 3 19 12 5 21 5 3"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">${isLoading ? 'Loading...' : 'Listen'}</span>
+                                    `}
+                                </button>
+                                <button type="button" data-save-song="${song.id}" aria-label="${saved ? 'Remove from saved' : 'Save song'}"
+                                    class="p-2.5 rounded-xl border transition-colors ${saved ? 'bg-cranberry-800 border-champagne-400/40 text-champagne-200' : 'bg-evergreen-800 hover:bg-evergreen-700 border-evergreen-600 text-champagne-300'}">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Attach audio preview listeners
+                grid.querySelectorAll('[data-play-song]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const song = POPULAR_WESTERN_SONGS.find(s => s.id === btn.getAttribute('data-play-song'));
+                        if (song) playSongSnippet(song);
+                    });
+                });
+
+                // Attach save listeners
+                grid.querySelectorAll('[data-save-song]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const song = POPULAR_WESTERN_SONGS.find(s => s.id === btn.getAttribute('data-save-song'));
+                        if (song) toggleSaveTrack(song);
+                    });
+                });
+            }
+
+            // Chart filter button handlers
+            document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeChartFilter = btn.getAttribute('data-chart-filter');
+                    document.querySelectorAll('.chart-filter-btn').forEach(b => {
+                        const active = b === btn;
+                        b.className = active
+                            ? 'chart-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-cranberry-800 text-champagne-200 border border-champagne-400/30 transition-all'
+                            : 'chart-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-evergreen-800 text-champagne-300 border border-evergreen-700 hover:text-champagne-200 transition-all';
+                    });
+                    renderPopularSongs();
+                });
+            });
+
+            // ==========================================
+            // 7. RECOMMENDATION ENGINE
+            // ==========================================
+            let displayedRecommendations = [];
+
+            function generateRecommendations(shuffle = false) {
+                const mood = document.getElementById('mood-select').value;
+                const genre = document.getElementById('rec-genre-select').value;
+                const activity = document.getElementById('activity-select').value;
+
+                // Score each song based on user criteria
+                let scored = RECOMMENDATION_CATALOG.map(track => {
+                    let score = 0;
+                    if (track.moods.includes(mood)) score += 3;
+                    if (track.activities.includes(activity)) score += 2;
+                    if (genre === 'any' || track.genre === genre) score += 4;
+                    if (shuffle) score += Math.random() * 2.5;
+                    return { ...track, score };
+                });
+
+                // Filter strictly by genre if chosen, fallback to best matches if fewer than 6
+                if (genre !== 'any') {
+                    const exactGenre = scored.filter(t => t.genre === genre);
+                    if (exactGenre.length >= 2) {
+                        scored = exactGenre;
+                    }
+                }
+
+                scored.sort((a, b) => b.score - a.score);
+                displayedRecommendations = scored.slice(0, 6);
+                renderCurrentRecommendations();
+            }
+
+            function renderCurrentRecommendations() {
+                const container = document.getElementById('recommendation-results');
+                
+                if (!displayedRecommendations.length) {
+                    container.innerHTML = `
+                        <div class="col-span-full rounded-2xl bg-evergreen-900 border border-evergreen-700 p-8 text-center">
+                            <p class="text-champagne-200 font-medium">No matching tracks found for this exact combination.</p>
+                            <p class="text-sm text-champagne-300/80 mt-1">Try selecting "Any Genre" to broaden your winter selection.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = displayedRecommendations.map(track => {
+                    const saved = isTrackSaved(track.id);
+                    const isCurrent = currentPlayingId === track.id;
+                    const isPlaying = isCurrent && isAudioPlaying;
+                    const isLoading = loadingTrackId === track.id;
+
+                    return `
+                        <article class="rounded-2xl bg-evergreen-900 border ${isCurrent ? 'border-champagne-400/60' : 'border-evergreen-700/80'} p-6 flex flex-col justify-between hover:border-champagne-400/40 transition-all fade-in">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-cranberry-900/90 border border-cranberry-700 text-champagne-200">${track.genre}</span>
+                                    ${isPlaying ? `
+                                        <span class="inline-flex items-end gap-0.5 h-4" aria-label="Playing">
+                                            <span class="eq-bar"></span>
+                                            <span class="eq-bar"></span>
+                                            <span class="eq-bar"></span>
+                                        </span>
+                                    ` : `<span class="text-xs text-champagne-400">Western Selection</span>`}
+                                </div>
+                                <h4 class="font-serif text-2xl font-semibold text-champagne-200 leading-snug">${track.title}</h4>
+                                <p class="text-sm font-medium text-champagne-400 mt-1">${track.artist}</p>
+                                <p class="text-xs sm:text-sm text-champagne-300/85 mt-4 leading-relaxed border-t border-evergreen-800 pt-3">
+                                    ${track.reason}
+                                </p>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-evergreen-800 flex items-center gap-2.5">
+                                <button type="button" data-rec-play="${track.id}"
+                                    class="flex-1 py-2.5 px-3 rounded-xl ${isCurrent ? 'bg-cranberry-800 border-champagne-400/40' : 'bg-evergreen-800 hover:bg-evergreen-700 border-evergreen-600'} border text-champagne-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                    ${isPlaying ? `
+                                        <svg class="w-3.5 h-3.5 text-champagne-200" viewBox="0 0 24 24" fill="currentColor">
+                                            <rect x="6" y="4" width="4" height="16"/>
+                                            <rect x="14" y="4" width="4" height="16"/>
+                                        </svg>
+                                        <span>Pause Preview</span>
+                                    ` : `
+                                        <svg class="w-3.5 h-3.5 text-champagne-400" viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="5 3 19 12 5 21 5 3"/>
+                                        </svg>
+                                        <span>${isLoading ? 'Loading Snippet...' : 'Listen Snippet'}</span>
+                                    `}
+                                </button>
+                                <button type="button" data-rec-save="${track.id}"
+                                    class="py-2.5 px-3.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-colors ${saved ? 'bg-cranberry-800 border-champagne-400/40 text-champagne-200' : 'bg-evergreen-800 hover:bg-evergreen-700 border-evergreen-600 text-champagne-200'}">
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                    <span>${saved ? 'Saved' : 'Save'}</span>
+                                </button>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+                container.querySelectorAll('[data-rec-play]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const track = displayedRecommendations.find(t => t.id === btn.getAttribute('data-rec-play'));
+                        if (track) playSongSnippet(track);
+                    });
+                });
+
+                container.querySelectorAll('[data-rec-save]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const track = displayedRecommendations.find(t => t.id === btn.getAttribute('data-rec-save'));
+                        if (track) toggleSaveTrack(track);
+                    });
+                });
+            }
+
+            document.getElementById('recommendation-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                generateRecommendations(false);
+                showToast('Updated recommendations for your mood');
+            });
+
+            document.getElementById('shuffle-rec-btn').addEventListener('click', () => {
+                generateRecommendations(true);
+                showToast('Refreshed song selection');
+            });
+
+            // ==========================================
+            // 8. SAVED COLLECTION DRAWER & MOBILE MENU
+            // ==========================================
+            const savedModal = document.getElementById('saved-modal');
+            const openSavedBtn = document.getElementById('open-saved-btn');
+            const closeSavedBtn = document.getElementById('close-saved-btn');
+            const doneSavedBtn = document.getElementById('done-saved-btn');
+            const savedBackdrop = document.getElementById('saved-modal-backdrop');
+            const clearSavedBtn = document.getElementById('clear-saved-btn');
+
+            function renderSavedDrawer() {
+                const list = document.getElementById('saved-songs-list');
+                if (!list) return;
+
+                if (savedTracks.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center py-12 px-4">
+                            <div class="w-12 h-12 rounded-2xl bg-evergreen-800 border border-evergreen-700 flex items-center justify-center mx-auto mb-3 text-champagne-400">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-champagne-200 font-medium text-sm">Your saved collection is empty</p>
+                            <p class="text-xs text-champagne-300/75 mt-1">Bookmark tracks from Western Charts or Recommendations to keep them here.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = savedTracks.map(track => {
+                    const isCurrent = currentPlayingId === track.id;
+                    const isPlaying = isCurrent && isAudioPlaying;
+                    return `
+                    <div class="p-4 rounded-xl bg-evergreen-950/80 border ${isCurrent ? 'border-champagne-400/50' : 'border-evergreen-800'} flex items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-medium text-champagne-200 text-sm truncate">${track.title}</h4>
+                            <p class="text-xs text-champagne-300/80 truncate">${track.artist} • <span class="text-champagne-400">${track.genre}</span></p>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" data-play-saved="${track.id}" aria-label="Listen to ${track.title}"
+                                class="p-2 rounded-lg bg-evergreen-900 hover:bg-evergreen-800 text-champagne-400 border border-evergreen-700 transition-colors">
+                                ${isPlaying ? `
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                        <rect x="6" y="4" width="4" height="16"/>
+                                        <rect x="14" y="4" width="4" height="16"/>
+                                    </svg>
+                                ` : `
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                `}
+                            </button>
+                            <button type="button" data-remove-saved="${track.id}" aria-label="Remove ${track.title}"
+                                class="p-2 rounded-lg text-champagne-300 hover:text-cranberry-600 hover:bg-evergreen-900 transition-colors">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+
+                list.querySelectorAll('[data-play-saved]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-play-saved');
+                        const target = savedTracks.find(t => t.id === id);
+                        if (target) playSongSnippet(target);
+                    });
+                });
+
+                list.querySelectorAll('[data-remove-saved]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-remove-saved');
+                        const target = savedTracks.find(t => t.id === id);
+                        if (target) toggleSaveTrack(target);
+                    });
+                });
+            }
+
+            function openModal() {
+                renderSavedDrawer();
+                savedModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                savedModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            openSavedBtn.addEventListener('click', openModal);
+            closeSavedBtn.addEventListener('click', closeModal);
+            doneSavedBtn.addEventListener('click', closeModal);
+            savedBackdrop.addEventListener('click', closeModal);
+
+            clearSavedBtn.addEventListener('click', () => {
+                if (savedTracks.length === 0) return;
+                savedTracks = [];
+                persistSavedTracks();
+                renderSavedDrawer();
+                renderPopularSongs();
+                renderCurrentRecommendations();
+                showToast('Cleared all saved songs');
+            });
+
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            });
+
+            // ==========================================
+            // 9. SUBTLE WINTER SNOWFALL CANVAS
+            // ==========================================
+            function initSnowfall() {
+                const canvas = document.getElementById('snow-canvas');
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+
+                const flakeCount = Math.min(45, Math.floor(width / 28));
+                const flakes = Array.from({ length: flakeCount }, () => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    r: Math.random() * 1.8 + 0.6,
+                    speedY: Math.random() * 0.45 + 0.15,
+                    drift: (Math.random() - 0.5) * 0.25
+                }));
+
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                });
+
+                function animateSnow() {
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.fillStyle = 'rgba(235, 228, 213, 0.55)';
+                    ctx.beginPath();
+                    for (const f of flakes) {
+                        ctx.moveTo(f.x, f.y);
+                        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                        f.y += f.speedY;
+                        f.x += f.drift;
+                        if (f.y > height) {
+                            f.y = -5;
+                            f.x = Math.random() * width;
+                        }
+                        if (f.x > width) f.x = 0;
+                        if (f.x < 0) f.x = width;
+                    }
+                    ctx.fill();
+                    requestAnimationFrame(animateSnow);
+                }
+                animateSnow();
+            }
+
+            // Initialize Application
+            loadSavedTracks();
+            renderGenres();
+            renderPopularSongs();
+            generateRecommendations(false);
+            initSnowfall();
+        });
+    </script>
+</body>
+</html>
